@@ -35,12 +35,12 @@ def fill_color(matrix, x_range, y_range, color):
 def recursive_fill(matrix, x_range, y_range, tree, line_width):
     if tree[0] == 'L':
         fill_color(matrix, x_range, y_range, np.array([int(tree[1]), int(tree[2]), int(tree[3])]))
-    elif tree[0] == 'V':
+    elif tree[0] == 'H':
         sep = int((x_range[-1]+1 - x_range[0]) * float(tree[1]) + x_range[0])
         recursive_fill(matrix, range(x_range[0], sep - line_width), y_range, tree[2], line_width)
         recursive_fill(matrix, range(sep + line_width, x_range[-1]+1), y_range, tree[3], line_width)
         fill_color(matrix, range(sep - line_width, sep + line_width), y_range, np.array([0, 0, 0]))
-    elif tree[0] == 'H':
+    elif tree[0] == 'V':
         sep = int((y_range[-1]+1 - y_range[0]) * float(tree[1]) + y_range[0])
         recursive_fill(matrix, x_range, range(y_range[0], sep - line_width), tree[2], line_width)
         recursive_fill(matrix, x_range, range(sep + line_width, y_range[-1]+1), tree[3], line_width)
