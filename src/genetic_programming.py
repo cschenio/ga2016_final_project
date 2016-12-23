@@ -6,6 +6,7 @@ Created on 2009-10-30
 from random import random, randint, choice
 from copy import deepcopy
 from PIL import Image, ImageDraw
+from operator import itemgetter, attrgetter
 import sys
 
 class cut:
@@ -255,7 +256,7 @@ class enviroment:
       print ("best tree's fitness..",self.besttree.fitness)
       #selection
       self.population = []
-      self.nextgeneration.sort()
+      self.nextgeneration.sort(key=attrgetter('fitness'))
       allfitness = 0
       randomnum = random()*(len(self.nextgeneration) - 1)
       dis = float(len(self.nextgeneration) - 1) / float(self.size)
