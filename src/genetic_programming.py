@@ -27,7 +27,7 @@ class variable:
     self.value = value
 
   def display(self, indent=0):
-    print self.var
+    print (self.var)
 
 class const:
   def __init__(self, value):
@@ -39,7 +39,7 @@ class const:
     return self.value
 
   def display(self, indent=0):
-    print self.value
+    print (self.value)
 
 class node:
   def __init__(self, type, children, funwrap, var=None, const=None):
@@ -76,7 +76,7 @@ class node:
       if value.has_key(self.variable.var):
         self.variable.setvar(value[self.variable.var])
       else:
-        print "There is no value for variable:", self.variable.var
+        print ("There is no value for variable:", self.variable.var)
         return
     if self.type == "constant":
       pass
@@ -212,9 +212,9 @@ class enviroment:
 
   def envolve(self, maxgen=100, crossrate=0.9, mutationrate=0.1):
     for i in range(0, maxgen):
-      print "generation no.", i
+      print ("generation no.", i)
       for j in range(0, self.size):
-        print self.population[j].lisporder
+        print (self.population[j].lisporder)
       self.nextgeneration = []
       for j in range(0, self.size):
         self.nextgeneration.append(self.population[j])
@@ -252,7 +252,7 @@ class enviroment:
         elif self.minimaxtype == "max":
           if self.nextgeneration[k].fitness > self.besttree.fitness:
             self.besttree = self.nextgeneration[k]
-      print "best tree's fitness..",self.besttree.fitness
+      print ("best tree's fitness..",self.besttree.fitness)
       #selection
       self.population = []
       self.nextgeneration.sort()
@@ -269,7 +269,7 @@ class enviroment:
           randomnum -= float(len(self.nextgeneration) - 1)
       if self.besttree.fitness == 0:
         break;
-    print self.besttree.lisporder
+    print (self.besttree.lisporder)
     #for tree in self.nextgeneration:
      # print tree.fitness
 
