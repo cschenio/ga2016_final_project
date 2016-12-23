@@ -68,7 +68,8 @@ class node:
       return self.funwrap.function(result)  
 
   def getfitness(self):
-    self.fitness=random()
+    self.getcut()
+    self.fitness=10-self.cut
 
   def setvariablevalue(self, value):
     if self.type == "variable":
@@ -85,6 +86,7 @@ class node:
 
   def refreshdepth(self):
     self.lisporder = ""
+    self.cut = 0
     if self.type == "constant" or self.type == "variable":
       return 0
     else:
@@ -107,6 +109,13 @@ class node:
         self.lisporder += c.display(indent + 1)
     self.lisporder += ")"
     return self.lisporder
+  def getcut(self, indent=0):
+    if self.type == "function":
+      self.cut += 1
+    if self.children:
+      for c in self.children:
+        self.cut += c.getcut(indent + 1)
+    return self.cut
   ##for draw node
   def getwidth(self):
     if self.type == "variable" or self.type == "constant":
@@ -120,11 +129,13 @@ class node:
 
 class enviroment:
   def __init__(self, funwraplist, variablelist, constantlist, checkdata, \
-               minimaxtype="min", population=None, size=10, maxdepth=3, \
+               minimaxtype="min", population=None, size=10, maxdepth=50, maxcut = 6,\
                maxgen=100, crossrate=0.9, mutationrate=0.1, newbirthrate=0.6):
     self.funwraplist = funwraplist
     self.variablelist = variablelist
     self.constantlist = constantlist
+    self.maxcut = maxcut
+    self.cut = 0
     self.checkdata = checkdata
     self.minimaxtype = minimaxtype
     self.maxdepth = maxdepth
@@ -135,13 +146,13 @@ class enviroment:
     self.mutationrate = mutationrate
     self.newbirthrate = newbirthrate
     self.nextgeneration = []
+    
 
     self.besttree = self.population[0]
     for i in range(0, self.size):
-      self.population[i].lisporder = ""
-      self.population[i].display
-    for i in range(0, self.size):
       self.population[i].depth=self.population[i].refreshdepth()
+      self.population[i].display()
+    for i in range(0, self.size):
       self.population[i].getfitness()
       if self.minimaxtype == "min":
         if self.population[i].fitness < self.besttree.fitness:
@@ -151,8 +162,14 @@ class enviroment:
           self.besttree = self.population[i]    
 
   def _makepopulation(self, popsize):
-    return [self._maketree(0) for i in range(0, popsize)]     
-
+    temp = []
+    for i in range(0,popsize):
+      while True:
+        Tree = self._maketree(0)
+        if Tree.getcut() <= self.maxcut:
+          temp.append(Tree)
+          break
+    return temp
   def _maketree(self, startdepth):
     if startdepth == 0:
       #make a new tree
@@ -196,19 +213,29 @@ class enviroment:
   def envolve(self, maxgen=100, crossrate=0.9, mutationrate=0.1):
     for i in range(0, maxgen):
       print "generation no.", i
+      for j in range(0, self.size):
+        print self.population[j].lisporder
       self.nextgeneration = []
       for j in range(0, self.size):
         self.nextgeneration.append(self.population[j])
       for j in range(0, 2*self.size):
         if random() < self.crossrate:
-          parent1 = self.population[int(random() * (self.size))]
-          parent2 = self.population[int(random() * (self.size))]
-          child = self.crossover(parent1, parent2)
-          self.nextgeneration.append(child)
+          while True:
+            parent1 = self.population[int(random() * (self.size))]
+            parent2 = self.population[int(random() * (self.size))]
+            child = self.crossover(parent1, parent2)
+            child.refreshdepth()
+            if child.getcut() <= self.maxcut:
+              self.nextgeneration.append(child)
+              break
         else:
-          parent3 = self.population[int(random() * (self.size))]
-          child = self.mutate(parent3, mutationrate)
-          self.nextgeneration.append(child)
+          while True:
+            parent3 = self.population[int(random() * (self.size))]
+            child = self.mutate(parent3, mutationrate)
+            child.refreshdepth()
+            if child.getcut() <= self.maxcut:
+              self.nextgeneration.append(child)
+              break
       #refresh depth    
       for k in range(0, len(self.nextgeneration)):
         self.nextgeneration[k].depth=self.nextgeneration[k].refreshdepth()
@@ -304,5 +331,5 @@ if __name__ == "__main__":
   checkdata = constructcheckdata(count = 10)
   #print checkdata
   env = enviroment([horizontal, vertical], ["L 0 0 255", "L 255 0 0", "L 255 255 0", "L 255 255 255"],
-                  [-3, -2, -1, 1, 2, 3], checkdata, size = 10)
-  env.envolve(maxgen = 10)
+                  [-3, -2, -1, 1, 2, 3], checkdata, size = 10, maxcut = 5, maxdepth = 20)
+  env.envolve(maxgen = 3)
