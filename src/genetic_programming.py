@@ -219,6 +219,8 @@ class enviroment:
       self.nextgeneration = []
       for j in range(0, self.size):
         self.nextgeneration.append(self.population[j])
+      for j in range(0, self.size):
+        self.nextgeneration[j].refreshdepth()
       for j in range(0, 2*self.size):
         if random() < self.crossrate:
           while True:
