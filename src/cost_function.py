@@ -36,16 +36,21 @@ def recursive_fill(matrix, x_range, y_range, tree, line_width):
     if tree[0] == 'L':
         fill_color(matrix, x_range, y_range, np.array([int(tree[1]), int(tree[2]), int(tree[3])]))
     elif tree[0] == 'H':
-        sep = int((x_range[-1]+1 - x_range[0]) * float(tree[1]) + x_range[0])
-        recursive_fill(matrix, range(x_range[0], sep - line_width), y_range, tree[2], line_width)
-        recursive_fill(matrix, range(sep + line_width, x_range[-1]+1), y_range, tree[3], line_width)
-        fill_color(matrix, range(sep - line_width, sep + line_width), y_range, np.array([0, 0, 0]))
+        try:
+            sep = int((x_range[-1]+1 - x_range[0]) * float(tree[1]) + x_range[0])
+            recursive_fill(matrix, range(x_range[0], sep - line_width), y_range, tree[2], line_width)
+            recursive_fill(matrix, range(sep + line_width, x_range[-1]+1), y_range, tree[3], line_width)
+            fill_color(matrix, range(sep - line_width, sep + line_width), y_range, np.array([0, 0, 0]))
+        except IndexError:
+            print("Resolution not enough, cut cannot be seen.")        
     elif tree[0] == 'V':
-        sep = int((y_range[-1]+1 - y_range[0]) * float(tree[1]) + y_range[0])
-        recursive_fill(matrix, x_range, range(y_range[0], sep - line_width), tree[2], line_width)
-        recursive_fill(matrix, x_range, range(sep + line_width, y_range[-1]+1), tree[3], line_width)
-        fill_color(matrix, x_range, range(sep - line_width, sep + line_width), np.array([0, 0, 0]))
-                       
+        try:
+            sep = int((y_range[-1]+1 - y_range[0]) * float(tree[1]) + y_range[0])
+            recursive_fill(matrix, x_range, range(y_range[0], sep - line_width), tree[2], line_width)
+            recursive_fill(matrix, x_range, range(sep + line_width, y_range[-1]+1), tree[3], line_width)
+            fill_color(matrix, x_range, range(sep - line_width, sep + line_width), np.array([0, 0, 0]))
+        except IndexError:
+            print("Resolution not enough, cut cannot be seen.")
 # to_array: string(sexp) -> np.array(size_x, size_y, 3)
 def to_array(str_sexp, size_x=640, size_y=640, line_width=5):
     tree = parse_sexp(str_sexp)    
@@ -71,3 +76,8 @@ def to_array(str_sexp, size_x=640, size_y=640, line_width=5):
 
 # random testing end
 
+# print(convert_color(sRGBColor(0, 0, 0, True), LabColor))
+# print(convert_color(sRGBColor(255, 255, 255, True), LabColor))
+# print(convert_color(sRGBColor(255, 0, 0, True), LabColor))
+# print(convert_color(sRGBColor(255, 255, 0, True), LabColor))
+# print(convert_color(sRGBColor(0, 0, 255, True), LabColor))

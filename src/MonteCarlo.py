@@ -7,6 +7,8 @@ import numpy as np
 import pyparsing as pp
 from cost_function import *
 
+DATA_DIR = "../data/"
+
 colors=np.array([[255, 0, 0], [255, 255, 0], [0, 0, 255], [255, 255, 255]],dtype=np.uint8)
 #colors=[LabColor(lab_l=0.0000 lab_a=0.0000 lab_b=0.0000),LabColor(lab_l:100.0000 lab_a:-0.0005 lab_b:-0.0086),LabColor(lab_l:53.2390 lab_a:80.0905 lab_b:67.2014),LabColor(lab_l:97.1388 lab_a:-21.5578 lab_b:94.4773),LabColor(lab_l:32.2994 lab_a:79.1914 lab_b:-107.8655)]
 # cost: np.array(size_x, size_y, 3) , np.array(size_x, size_y, 3) -> float
@@ -75,4 +77,4 @@ def random_tree(k, matrix):
     
     return M_to_array(s, np.array(matrix, dtype=np.uint8), 100, 100, 1)
     
-#rgb2pic(random_tree(10, pic2rgb('blue.jpg')))
+rgb2pic(random_tree(10, pic2rgb(DATA_DIR + 'img02.jpg')))

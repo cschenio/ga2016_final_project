@@ -2,10 +2,7 @@ from PIL import Image, ImageDraw
 from sys import argv
 import numpy as np
 
-def pic2rgb(filename):
-
-    width = 400
-    height = 400
+def pic2rgb(filename, width=400, height=400):
     new_pic = "resized.jpg"
     
     im = Image.open(filename)

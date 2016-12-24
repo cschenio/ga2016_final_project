@@ -8,6 +8,8 @@ from copy import deepcopy
 from PIL import Image, ImageDraw
 from operator import itemgetter, attrgetter
 import sys
+import cost_function as cf
+import pic
 
 class cut:
   def __init__(self, name, childcount):
@@ -57,6 +59,7 @@ class node:
       self.portion = random()
       self.portion = round(self.portion, 3)
     self.lisporder = ""
+    self.matrix = None
 
   def eval(self):
     if self.type == "variable":
@@ -68,9 +71,12 @@ class node:
         result = [c.eval() for c in self.children]
       return self.funwrap.function(result)  
 
-  def getfitness(self):
-    self.getcut()
-    self.fitness=10-self.cut
+  def getfitness(self, image):
+    (x, y, _) = image.shape
+    self.matrix = cf.to_array(self.display(), x, y, 1)
+    self.fitness = cf.cost(self.matrix, image)
+#    self.getcut()
+#    self.fitness=10-self.cut
 
   def setvariablevalue(self, value):
     if self.type == "variable":
@@ -100,9 +106,10 @@ class node:
         return cmp(self.fitness, other.fitness)  
 
   def display(self, indent=0):
+    self.lisporder = ""
     self.lisporder += "("
     if self.type == "function":
-      self.lisporder += (self.funwrap.name + " " + str(self.portion))
+      self.lisporder += (self.funwrap.name + " " + str(self.portion) + " ")
     elif self.type == "variable":
       self.lisporder += self.variable.name
     if self.children:
@@ -110,6 +117,7 @@ class node:
         self.lisporder += c.display(indent + 1)
     self.lisporder += ")"
     return self.lisporder
+  
   def getcut(self, indent=0):
     if self.type == "function":
       self.cut += 1
@@ -129,7 +137,7 @@ class node:
     
 
 class enviroment:
-  def __init__(self, funwraplist, variablelist, constantlist, checkdata, \
+  def __init__(self, funwraplist, variablelist, constantlist, checkdata, target_image,\
                minimaxtype="min", population=None, size=10, maxdepth=50, maxcut = 6,\
                maxgen=100, crossrate=0.9, mutationrate=0.1, newbirthrate=0.6):
     self.funwraplist = funwraplist
@@ -138,6 +146,7 @@ class enviroment:
     self.maxcut = maxcut
     self.cut = 0
     self.checkdata = checkdata
+    self.target_image = target_image
     self.minimaxtype = minimaxtype
     self.maxdepth = maxdepth
     self.population = population or self._makepopulation(size)
@@ -154,7 +163,7 @@ class enviroment:
       self.population[i].depth=self.population[i].refreshdepth()
       self.population[i].display()
     for i in range(0, self.size):
-      self.population[i].getfitness()
+      self.population[i].getfitness(self.target_image)
       if self.minimaxtype == "min":
         if self.population[i].fitness < self.besttree.fitness:
           self.besttree = self.population[i]
@@ -214,6 +223,7 @@ class enviroment:
   def envolve(self, maxgen=100, crossrate=0.9, mutationrate=0.1):
     for i in range(0, maxgen):
       print ("generation no.", i)
+      self.listpopulation()
       for j in range(0, self.size):
         print (self.population[j].lisporder)
       self.nextgeneration = []
@@ -248,7 +258,7 @@ class enviroment:
         self.nextgeneration[i].display()
       #refresh all tree's fitness
       for k in range(0, len(self.nextgeneration)):
-        self.nextgeneration[k].getfitness()
+        self.nextgeneration[k].getfitness(self.target_image)
         if self.minimaxtype == "min":
           if self.nextgeneration[k].fitness < self.besttree.fitness:
             self.besttree = self.nextgeneration[k]
@@ -272,7 +282,7 @@ class enviroment:
           randomnum -= float(len(self.nextgeneration) - 1)
       if self.besttree.fitness == 0:
         break;
-    print (self.besttree.lisporder)
+    return self.besttree.lisporder
     #for tree in self.nextgeneration:
      # print tree.fitness
 
@@ -310,29 +320,3 @@ class enviroment:
     for i in range(0, self.size):
       self.population[i].display()   
 
-#############################################################
-
-
-horizontal = cut('H',2)
-vertical = cut('V',2)
-
-def examplefun(x, y):
-  return x+2*y
-def constructcheckdata(count=10):
-  checkdata = []
-  for i in range(0, count):
-    dic = {}
-    x = randint(0, 10)
-    y = randint(0, 10)
-    dic['x'] = x
-    dic['y'] = y
-    dic['result'] = examplefun(x, y)
-    checkdata.append(dic)
-  return checkdata
-
-if __name__ == "__main__":
-  checkdata = constructcheckdata(count = 10)
-  #print checkdata
-  env = enviroment([horizontal, vertical], ["L 0 0 255", "L 255 0 0", "L 255 255 0", "L 255 255 255"],
-                  [-3, -2, -1, 1, 2, 3], checkdata, size = 10, maxcut = 5, maxdepth = 20)
-  env.envolve(maxgen = 3)
