@@ -24,8 +24,8 @@ def pic2rgb(filename, width=400, height=400):
     #print(im_array)
     return im_array
 
-def rgb2pic(im_array):
-    ans_pic = "master_piece.jpg"
+def rgb2pic(im_array, filename):
+    ans_pic = filename
     im = Image.fromarray(im_array,'RGB')
     im.save(ans_pic)
     print('save GA as: ',ans_pic)

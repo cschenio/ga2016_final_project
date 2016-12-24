@@ -60,7 +60,7 @@ def M_to_array(str_sexp, matrix, size_x=640, size_y=640, line_width=5):
     M_recursive_fill(matrix, range(0, size_x), range(0, size_y), tree[0], line_width)
     return matrix
 
-def random_tree(k, matrix):
+def random_tree(k, matrix, x=640, y=640, line_width=5):
     
     cut_num = k
     leaf_num = k+1
@@ -75,6 +75,6 @@ def random_tree(k, matrix):
     
     s = "".join(leaves)[1:]
     
-    return M_to_array(s, np.array(matrix, dtype=np.uint8), 100, 100, 1)
+    return M_to_array(s, np.array(matrix, dtype=np.uint8), x, y, line_width)
     
-rgb2pic(random_tree(10, pic2rgb(DATA_DIR + 'img02.jpg')))
+
