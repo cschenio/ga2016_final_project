@@ -144,7 +144,7 @@ class enviroment:
     else:
       selectedvariable = randint(0, len(self.variablelist) - 1)
       return node("variable", None, None, \
-             variable(self.variablelist[selectedvariable]), None)
+            self.variablelist[selectedvariable], None)
 
   def mutate(self, tree, probchange=0.5, startdepth=0):
     if random() < probchange:
