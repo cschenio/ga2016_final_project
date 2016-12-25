@@ -127,10 +127,7 @@ class enviroment:
           break
     return temp
   def _maketree(self, startdepth):
-    if startdepth == 0:
-      #make a new tree
-      nodepattern = 0#function
-    elif startdepth == self.maxdepth:
+    if startdepth == self.maxdepth:
       nodepattern = 1#variable or constant
     else:
       nodepattern = randint(0, 1)
