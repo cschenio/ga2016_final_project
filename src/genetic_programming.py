@@ -16,28 +16,6 @@ class cut:
     self.name = name
     self.childcount = 2
 
-class variable:
-  def __init__(self, var, value=0):
-    self.var = var
-    self.value = value
-    self.name = str(var)
-    self.type = "variable"  
-
-  def evaluate(self):
-    return self.value
-
-  def setvar(self, value):
-    self.value = value
-
-  def display(self, indent=0):
-    print (self.var)
-
-class const:
-  def __init__(self, value):
-    self.value = value
-    self.name = str(value)
-    self.type = "constant"   
-
   def evaluate(self):
     return self.value
 
@@ -61,35 +39,13 @@ class node:
     self.lisporder = ""
     self.matrix = None
 
-  def eval(self):
-    if self.type == "variable":
-      return self.variable.value
-    elif self.type == "constant":
-      return self.const.value
-    else:
-      for c in self.children:
-        result = [c.eval() for c in self.children]
-      return self.funwrap.function(result)  
 
   def getfitness(self, image):
     (x, y, _) = image.shape
     self.matrix = cf.to_array(self.display(), x, y, 1)
     self.fitness = cf.cost(self.matrix, image)
 #    self.getcut()
-#    self.fitness=10-self.cut
-
-  def setvariablevalue(self, value):
-    if self.type == "variable":
-      if value.has_key(self.variable.var):
-        self.variable.setvar(value[self.variable.var])
-      else:
-        print ("There is no value for variable:", self.variable.var)
-        return
-    if self.type == "constant":
-      pass
-    if self.children:#function node
-      for child in self.children:
-        child.setvariablevalue(value)            
+#    self.fitness=10-self.cut       
 
   def refreshdepth(self):
     self.lisporder = ""
@@ -125,16 +81,6 @@ class node:
       for c in self.children:
         self.cut += c.getcut(indent + 1)
     return self.cut
-  ##for draw node
-  def getwidth(self):
-    if self.type == "variable" or self.type == "constant":
-      return 1
-    else:
-      result = 0
-      for i in range(0, len(self.children)):
-        result += self.children[i].getwidth()
-      return result
-    
 
 class enviroment:
   def __init__(self, funwraplist, variablelist, constantlist, checkdata, target_image,\
