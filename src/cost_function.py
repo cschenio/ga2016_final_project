@@ -11,8 +11,10 @@ def cost(array_a, array_b):
     b = array_b.reshape(-1, 3)
     sum = 0
     for i in range(len(a)):
-        color_a = convert_color(sRGBColor(a[i][0], a[i][1], a[i][2], True), LabColor)
-        color_b = convert_color(sRGBColor(b[i][0], b[i][1], b[i][2], True), LabColor)        
+        #color_a = convert_color(sRGBColor(a[i][0], a[i][1], a[i][2], True), LabColor)
+        #color_b = convert_color(sRGBColor(b[i][0], b[i][1], b[i][2], True), LabColor)        
+        color_a = (LabColor(a[i][0], a[i][1], a[i][2]))
+        color_b = (LabColor(b[i][0], b[i][1], b[i][2]))
         sum += delta_e_cie2000(color_a, color_b)
     return sum
 
