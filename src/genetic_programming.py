@@ -45,7 +45,7 @@ class const:
     print (self.value)
 
 class node:
-  def __init__(self, type, children, funwrap, var=None, const=None):
+  def __init__(self, type, children, funwrap, var="", const=None):
     self.type = type
     self.children = children
     self.funwrap = funwrap
@@ -111,7 +111,7 @@ class node:
     if self.type == "function":
       self.lisporder += (self.funwrap.name + " " + str(self.portion) + " ")
     elif self.type == "variable":
-      self.lisporder += self.variable.name
+      self.lisporder += self.variable
     if self.children:
       for c in self.children:
         self.lisporder += c.display(indent + 1)
@@ -200,15 +200,26 @@ class enviroment:
       return node("variable", None, None, \
              variable(self.variablelist[selectedvariable]), None)
 
-  def mutate(self, tree, probchange=0.1, startdepth=0):
+  def mutate(self, tree, probchange=0.5, startdepth=0):
     if random() < probchange:
-      return self._maketree(startdepth)
-    else:
-      result = deepcopy(tree)
-      if result.type == "function":
-        result.children = [self.mutate(c, probchange, startdepth + 1) \
-                           for c in tree.children]
-    return result
+      if tree.type == "function":
+        selectedfun = randint(0, len(self.funwraplist) - 1)
+        tree.funwrap = self.funwraplist[selectedfun]
+        tree.portion = round(random(), 3)
+      else:
+        if random() < 0.5:
+          selectedvariable = randint(0, len(self.variablelist) - 1)
+          tree.variable = self.variablelist[selectedvariable]
+        else:
+          tree.type = "function"
+          selectedfun = randint(0, len(self.funwraplist) - 1)
+          tree.funwrap = self.funwraplist[selectedfun]
+          tree.portion = round(random(), 3)
+          tree.children = [self._maketree(self.maxdepth) for i in range(0,2)]
+    elif tree.type == "function":
+      selectedchild = randint(0, len(tree.children) - 1)
+      self.mutate(tree.children[selectedchild], probchange, startdepth + 1)
+
 
   def crossover(self, tree1, tree2, probswap=0.8, top=1):
     if not top:
@@ -244,7 +255,8 @@ class enviroment:
         else:
           while True:
             parent3 = self.population[int(random() * (self.size))]
-            child = self.mutate(parent3, mutationrate)
+            child = deepcopy(parent3)
+            self.mutate(child)
             child.refreshdepth()
             if child.getcut() <= self.maxcut:
               self.nextgeneration.append(child)
