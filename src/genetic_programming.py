@@ -170,8 +170,11 @@ class enviroment:
     else:
       result = deepcopy(tree1)
       if tree1.type == "function" and tree2.type == "function":
-        result.children = [self.crossover(c, choice(tree2.children), \
-                           probswap, 0) for c in tree1.children]
+        selectedchild = randint(0, len(result.children) - 1)
+        result.children[selectedchild] = self.crossover(tree1.children[selectedchild], choice(tree2.children), \
+                           probswap, 0)
+      else:
+        result = deepcopy(tree2)
     return result
 
   def envolve(self, maxgen=100, crossrate=0.9, mutationrate=0.1):

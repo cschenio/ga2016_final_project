@@ -59,7 +59,7 @@ def M_to_array(str_sexp, matrix, size_x=640, size_y=640, line_width=5):
   
     
 def random_tree(k, matrix):
-    
+    k=randint(1,k)
     cut_num = k
     leaf_num = k+1
     
