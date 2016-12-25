@@ -165,7 +165,7 @@ class enviroment:
 
 
   def crossover(self, tree1, tree2, probswap=0.8, top=1):
-    if not top:
+    if random() < probswap and not top:
       return deepcopy(tree2)
     else:
       result = deepcopy(tree1)
