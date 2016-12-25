@@ -7,35 +7,33 @@ import numpy as np
 import pyparsing as pp
 from cost_function import *
 
-DATA_DIR = "../data/"
-
 colors=np.array([[255, 0, 0], [255, 255, 0], [0, 0, 255], [255, 255, 255]],dtype=np.uint8)
-#colors=[LabColor(lab_l=0.0000 lab_a=0.0000 lab_b=0.0000),LabColor(lab_l:100.0000 lab_a:-0.0005 lab_b:-0.0086),LabColor(lab_l:53.2390 lab_a:80.0905 lab_b:67.2014),LabColor(lab_l:97.1388 lab_a:-21.5578 lab_b:94.4773),LabColor(lab_l:32.2994 lab_a:79.1914 lab_b:-107.8655)]
-# cost: np.array(size_x, size_y, 3) , np.array(size_x, size_y, 3) -> float
-
 
 def M_recursive_fill(matrix, x_range, y_range, tree, line_width):
-    if not x_range or not y_range: return
     if tree[0] == 'L':
-        fill_color(matrix, x_range, y_range, choose_color(matrix, x_range, y_range))
+        fill_color(matrix, x_range, y_range, choose_color(matrix, x_range, y_range, tree))
     elif tree[0] == 'H':
-        sep = int((x_range[-1]+1 - x_range[0]) * float(tree[1]) + x_range[0])
-        M_recursive_fill(matrix, range(x_range[0], sep - line_width), y_range, tree[2], line_width)
-        M_recursive_fill(matrix, range(sep + line_width, x_range[-1]+1), y_range, tree[3], line_width)
-        fill_color(matrix, range(sep - line_width, sep + line_width), y_range, np.array([0, 0, 0]))
+        try:
+            sep = int((x_range[-1]+1 - x_range[0]) * float(tree[1]) + x_range[0])
+            M_recursive_fill(matrix, range(x_range[0], sep - line_width), y_range, tree[2], line_width)
+            M_recursive_fill(matrix, range(sep + line_width, x_range[-1]+1), y_range, tree[3], line_width)
+            fill_color(matrix, range(sep - line_width, sep + line_width), y_range, np.array([0, 0, 0]))
+        except IndexError:
+            print("Resolution not enough, cut cannot be seen.")        
     elif tree[0] == 'V':
-        sep = int((y_range[-1]+1 - y_range[0]) * float(tree[1]) + y_range[0])
-        M_recursive_fill(matrix, x_range, range(y_range[0], sep - line_width), tree[2], line_width)
-        M_recursive_fill(matrix, x_range, range(sep + line_width, y_range[-1]+1), tree[3], line_width)
-        fill_color(matrix, x_range, range(sep - line_width, sep + line_width), np.array([0, 0, 0]))
-                       
+        try:
+            sep = int((y_range[-1]+1 - y_range[0]) * float(tree[1]) + y_range[0])
+            M_recursive_fill(matrix, x_range, range(y_range[0], sep - line_width), tree[2], line_width)
+            M_recursive_fill(matrix, x_range, range(sep + line_width, y_range[-1]+1), tree[3], line_width)
+            fill_color(matrix, x_range, range(sep - line_width, sep + line_width), np.array([0, 0, 0]))
+        except IndexError:
+            print("Resolution not enough, cut cannot be seen.")
 
-def choose_color(matrix, x_range, y_range):
-    if not x_range or not y_range: return np.array([255, 0, 0],dtype=np.uint8)
+def choose_color(matrix, x_range, y_range, tree):
+
     error, choice= np.inf, []
     seg=matrix[x_range[0]:x_range[-1]+1][y_range[0]:y_range[-1]+1]
-    print(seg.shape)
-    print("color, color_cost, min_error ")
+
     for color in colors:
         color_matrix=np.zeros(seg.shape, dtype=np.uint8)
         for i in range(len(seg)):
@@ -46,21 +44,21 @@ def choose_color(matrix, x_range, y_range):
         if  color_cost < error: 
             error=color_cost
             choice=color
-            
-        print(color,color_cost,error)
-        
-    print("\nchoice",choice,'\n')
+
+    for i in range(3):
+        tree[i+1]=str(choice[i])
     return choice
     
 # M_to_array: string(sexp) -> np.array(size_x, size_y, 3)
 def M_to_array(str_sexp, matrix, size_x=640, size_y=640, line_width=5):
-    tree = parse_sexp(str_sexp)    
-    # print(tree)
-    #matrix = np.zeros((size_x, size_y, 3), dtype=np.uint8)
-    M_recursive_fill(matrix, range(0, size_x), range(0, size_y), tree[0], line_width)
-    return matrix
 
-def random_tree(k, matrix, x=640, y=640, line_width=5):
+    tree = parse_sexp(str_sexp)    
+    M_recursive_fill(matrix, range(0, size_x), range(0, size_y), tree[0], line_width)
+
+    return matrix, tree
+  
+    
+def random_tree(k, matrix):
     
     cut_num = k
     leaf_num = k+1
@@ -74,7 +72,14 @@ def random_tree(k, matrix, x=640, y=640, line_width=5):
         del leaves[ran+1]
     
     s = "".join(leaves)[1:]
-    
-    return M_to_array(s, np.array(matrix, dtype=np.uint8), x, y, line_width)
-    
 
+    matrix, tree = M_to_array(s, np.array(matrix, dtype=np.uint8), 100, 100, 1)
+    
+    str_tree=("%s"%tree)[1:-1]
+    re=[("'",''), (",",''), ('[','('), (']',')')]
+    for t in re:
+        str_tree=str_tree.replace(t[0],t[1])
+
+    return str_tree
+    
+#print(random_tree(10, pic2rgb('1.jpg'))) return a lisp tree string
