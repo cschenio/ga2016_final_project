@@ -30,7 +30,7 @@ y = 50
 
 # gp
 target_image = pic.pic2rgb("../data/img03.jpg", x, y)
-env = gp.enviroment([horizontal, vertical], ["L 0 0 255", "L 255 0 0", "L 255 255 0", "L 255 255 255"],
+env = gp.enviroment([horizontal, vertical], ["L 100.0000 -0.0005 -0.0086", "L 53.2390 80.0905 67.2014", "L 97.1388 -21.5578 94.4773", "L 32.2994 79.1914 -107.8655"],
                    [-3, -2, -1, 1, 2, 3], checkdata, target_image, size = 50, maxcut = 5, maxdepth = 20)
 s = env.envolve(maxgen = 10)
 rgbmatrix = cf.to_array(s, x, y, 1)
@@ -40,9 +40,10 @@ pic.rgb2pic(rgbmatrix, "../data/output03_gp.jpg")
 min_cost = -1
 answer = None
 for i in range(10):
-    candidate = mc.random_tree(5, pic.pic2rgb('../data/img03.jpg'), x, y, 1))
+    candidate = cf.to_array(mc.random_tree(5, pic.pic2rgb('../data/img03.jpg'), x, y, 1))
+    
     candidate_cost = cf.cost(candidate, target_image)
-    if min_cost == -1 || candidate_cost < min_cost:
+    if min_cost == -1 or candidate_cost < min_cost:
         answer = candidate
         min_cost = candidate_cost
 
