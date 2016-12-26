@@ -41,7 +41,7 @@ class node:
 
 
   def getfitness(self, image):
-    (x, y, _) = image.shape
+    x, y  = image.shape
     self.matrix = cf.to_array(self.display(), x, y, 1)
     self.fitness = cf.cost(self.matrix, image)
 #    self.getcut()

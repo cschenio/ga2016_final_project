@@ -9,10 +9,10 @@ from cost_function import *
 
 #colors=np.array([[255, 0, 0], [255, 255, 0], [0, 0, 255], [255, 255, 255]],dtype=np.uint8)
  
-colors=[LabColor (lab_l:100.0000 lab_a:-0.0005 lab_b:-0.0086),
-        LabColor (lab_l:53.2390 lab_a:80.0905 lab_b:67.2014),
-        LabColor (lab_l:97.1388 lab_a:-21.5578 lab_b:94.4773),
-        LabColor (lab_l:32.2994 lab_a:79.1914 lab_b:-107.8655)]
+colors=[LabColor (100.0000, -0.0005, -0.0086),
+        LabColor (53.2390, 80.0905, 67.2014),
+        LabColor (97.1388, -21.5578, 94.4773),
+        LabColor (32.2994, 79.1914, -107.8655)]
 
 def M_recursive_fill(matrix, x_range, y_range, tree, line_width):
     if tree[0] == 'L':
@@ -22,7 +22,7 @@ def M_recursive_fill(matrix, x_range, y_range, tree, line_width):
             sep = int((x_range[-1]+1 - x_range[0]) * float(tree[1]) + x_range[0])
             M_recursive_fill(matrix, range(x_range[0], sep - line_width), y_range, tree[2], line_width)
             M_recursive_fill(matrix, range(sep + line_width, x_range[-1]+1), y_range, tree[3], line_width)
-            fill_color(matrix, range(sep - line_width, sep + line_width), y_range, LabColor (lab_l:0.0000 lab_a:0.0000 lab_b:0.0000)))
+            fill_color(matrix, range(sep - line_width, sep + line_width), y_range, LabColor (0.0000,0.0000,0.0000))
         except IndexError:
             print("Resolution not enough, cut cannot be seen.")        
     elif tree[0] == 'V':
@@ -30,7 +30,7 @@ def M_recursive_fill(matrix, x_range, y_range, tree, line_width):
             sep = int((y_range[-1]+1 - y_range[0]) * float(tree[1]) + y_range[0])
             M_recursive_fill(matrix, x_range, range(y_range[0], sep - line_width), tree[2], line_width)
             M_recursive_fill(matrix, x_range, range(sep + line_width, y_range[-1]+1), tree[3], line_width)
-            fill_color(matrix, x_range, range(sep - line_width, sep + line_width), LabColor (lab_l:0.0000 lab_a:0.0000 lab_b:0.0000)))
+            fill_color(matrix, x_range, range(sep - line_width, sep + line_width), LabColor (0, 0, 0))
         except IndexError:
             print("Resolution not enough, cut cannot be seen.")
 

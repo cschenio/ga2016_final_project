@@ -34,7 +34,7 @@ env = gp.enviroment([horizontal, vertical], ["L 100.0000 -0.0005 -0.0086", "L 53
                    [-3, -2, -1, 1, 2, 3], checkdata, target_image, size = 50, maxcut = 5, maxdepth = 20)
 s = env.envolve(maxgen = 10)
 rgbmatrix = cf.to_array(s, x, y, 1)
-pic.rgb2pic(rgbmatrix, "../data/output03_gp.jpg")
+#pic.rgb2pic(rgbmatrix, "../data/output03_gp.jpg")
 
 # monte carlo
 min_cost = -1
@@ -47,5 +47,5 @@ for i in range(10):
         answer = candidate
         min_cost = candidate_cost
 
-pic.rgb2pic(answer, "../data/output03_mc.jpg")
+#pic.rgb2pic(answer, "../data/output03_mc.jpg")
     
