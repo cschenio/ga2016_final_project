@@ -7,7 +7,12 @@ import numpy as np
 import pyparsing as pp
 from cost_function import *
 
-colors=np.array([[255, 0, 0], [255, 255, 0], [0, 0, 255], [255, 255, 255]],dtype=np.uint8)
+#colors=np.array([[255, 0, 0], [255, 255, 0], [0, 0, 255], [255, 255, 255]],dtype=np.uint8)
+ 
+colors=[LabColor (lab_l:100.0000 lab_a:-0.0005 lab_b:-0.0086),
+        LabColor (lab_l:53.2390 lab_a:80.0905 lab_b:67.2014),
+        LabColor (lab_l:97.1388 lab_a:-21.5578 lab_b:94.4773),
+        LabColor (lab_l:32.2994 lab_a:79.1914 lab_b:-107.8655)]
 
 def M_recursive_fill(matrix, x_range, y_range, tree, line_width):
     if tree[0] == 'L':
@@ -17,7 +22,7 @@ def M_recursive_fill(matrix, x_range, y_range, tree, line_width):
             sep = int((x_range[-1]+1 - x_range[0]) * float(tree[1]) + x_range[0])
             M_recursive_fill(matrix, range(x_range[0], sep - line_width), y_range, tree[2], line_width)
             M_recursive_fill(matrix, range(sep + line_width, x_range[-1]+1), y_range, tree[3], line_width)
-            fill_color(matrix, range(sep - line_width, sep + line_width), y_range, np.array([0, 0, 0]))
+            fill_color(matrix, range(sep - line_width, sep + line_width), y_range, LabColor (lab_l:0.0000 lab_a:0.0000 lab_b:0.0000)))
         except IndexError:
             print("Resolution not enough, cut cannot be seen.")        
     elif tree[0] == 'V':
@@ -25,7 +30,7 @@ def M_recursive_fill(matrix, x_range, y_range, tree, line_width):
             sep = int((y_range[-1]+1 - y_range[0]) * float(tree[1]) + y_range[0])
             M_recursive_fill(matrix, x_range, range(y_range[0], sep - line_width), tree[2], line_width)
             M_recursive_fill(matrix, x_range, range(sep + line_width, y_range[-1]+1), tree[3], line_width)
-            fill_color(matrix, x_range, range(sep - line_width, sep + line_width), np.array([0, 0, 0]))
+            fill_color(matrix, x_range, range(sep - line_width, sep + line_width), LabColor (lab_l:0.0000 lab_a:0.0000 lab_b:0.0000)))
         except IndexError:
             print("Resolution not enough, cut cannot be seen.")
 
@@ -58,7 +63,7 @@ def M_to_array(str_sexp, matrix, size_x=640, size_y=640, line_width=5):
     return matrix, tree
   
     
-def random_tree(k, matrix):
+def random_tree(k, matrix, width=100, height = 100, line_width=5):
     k=randint(1,k)
     cut_num = k
     leaf_num = k+1
@@ -73,7 +78,7 @@ def random_tree(k, matrix):
     
     s = "".join(leaves)[1:]
 
-    matrix, tree = M_to_array(s, np.array(matrix, dtype=np.uint8), 100, 100, 1)
+    matrix, tree = M_to_array(s, matrix, width, height, 1)
     
     str_tree=("%s"%tree)[1:-1]
     re=[("'",''), (",",''), ('[','('), (']',')')]
@@ -82,4 +87,4 @@ def random_tree(k, matrix):
 
     return str_tree
     
-#print(random_tree(10, pic2rgb('1.jpg'))) return a lisp tree string
+#print(random_tree(10, pic2rgb('1.jpg'), 100, 100, 1))) #return a lisp tree string
