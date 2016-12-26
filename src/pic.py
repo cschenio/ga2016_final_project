@@ -5,10 +5,8 @@ from colormath.color_objects import sRGBColor, LabColor, XYZColor
 from colormath.color_diff import delta_e_cie2000
 from colormath.color_conversions import convert_color
 
-def pic2rgb(filename):
+def pic2rgb(filename, width = 100, height = 100):
 
-    width = 100
-    height = 100
     new_pic = "resized.jpg"
     
     im = Image.open(filename)
@@ -35,9 +33,24 @@ def pic2rgb(filename):
     labcolor_img = np.array(labcolor_img).reshape(row, col)
 
     return labcolor_img
+    
 
-def rgb2pic(im_array, filename):
-    ans_pic = filename
-    im = Image.fromarray(im_array,'RGB')
+def rgb2pic(im_array, format='LAB'):
+
+    ans_pic = "master_piece.jpg"
+    rgb_img=[]
+    row, col = len(im_array), len(im_array[0])
+    
+    if format != 'RGB':
+        for i in range(row):
+            for j in range(col):
+                a=convert_color(im_array[i][j], sRGBColor)
+                rgb_img.append([a.rgb_r*255, a.rgb_g*255, a.rgb_b*255])
+    
+    rgb_img=np.array(rgb_img, dtype=np.uint8).reshape(row, col, 3)
+    im = Image.fromarray(rgb_img,'RGB')
     im.save(ans_pic)
+    
     print('save GA as: ',ans_pic)
+
+#rgb2pic(pic2rgb("1.jpg"),'labcolor')
