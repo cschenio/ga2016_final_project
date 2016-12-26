@@ -31,7 +31,7 @@ y = 50
 # gp
 target_image = pic.pic2rgb("../data/img03.jpg", x, y)
 env = gp.enviroment([horizontal, vertical], ["L 100.0000 -0.0005 -0.0086", "L 53.2390 80.0905 67.2014", "L 97.1388 -21.5578 94.4773", "L 32.2994 79.1914 -107.8655"],
-                   [-3, -2, -1, 1, 2, 3], checkdata, target_image, size = 50, maxcut = 5, maxdepth = 20)
+                   [-3, -2, -1, 1, 2, 3], checkdata, target_image, size = 50, maxcut = 15, maxdepth = 20)
 s = env.envolve(maxgen = 10)
 rgbmatrix = cf.to_array(s, x, y, 1)
 #pic.rgb2pic(rgbmatrix, "../data/output03_gp.jpg")

@@ -126,16 +126,16 @@ class enviroment:
           temp.append(Tree)
           break
     return temp
-  def _maketree(self, startdepth):
+  def _maketree(self, startdepth, threshold=0.8):
     if startdepth == self.maxdepth:
       nodepattern = 1#variable or constant
     else:
-      nodepattern = randint(0, 1)
-    if nodepattern == 0:
+      nodepattern = random()
+    if nodepattern <= threshold:
       childlist = []
       selectedfun = randint(0, len(self.funwraplist) - 1)
       for i in range(0, self.funwraplist[selectedfun].childcount):
-        child = self._maketree(startdepth + 1)
+        child = self._maketree(startdepth + 1, threshold)
         childlist.append(child)
       return node("function", childlist, self.funwraplist[selectedfun])
     else:
