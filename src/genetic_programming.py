@@ -145,20 +145,7 @@ class enviroment:
 
   def mutate(self, tree, probchange=0.5, startdepth=0):
     if random() < probchange:
-      if tree.type == "function":
-        selectedfun = randint(0, len(self.funwraplist) - 1)
-        tree.funwrap = self.funwraplist[selectedfun]
-        tree.portion = round(random(), 3)
-      else:
-        if random() < 0.5:
-          selectedvariable = randint(0, len(self.variablelist) - 1)
-          tree.variable = self.variablelist[selectedvariable]
-        else:
-          tree.type = "function"
-          selectedfun = randint(0, len(self.funwraplist) - 1)
-          tree.funwrap = self.funwraplist[selectedfun]
-          tree.portion = round(random(), 3)
-          tree.children = [self._maketree(self.maxdepth) for i in range(0,2)]
+      tree = self._maketree(1)
     elif tree.type == "function":
       selectedchild = randint(0, len(tree.children) - 1)
       self.mutate(tree.children[selectedchild], probchange, startdepth + 1)
