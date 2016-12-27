@@ -151,18 +151,17 @@ class enviroment:
       self.mutate(tree.children[selectedchild], probchange, startdepth + 1)
 
 
-  def crossover(self, tree1, tree2, probswap=0.8, top=1):
-    if random() < probswap and not top:
-      return deepcopy(tree2)
-    else:
-      result = deepcopy(tree1)
-      if tree1.type == "function" and tree2.type == "function":
-        selectedchild = randint(0, len(result.children) - 1)
-        result.children[selectedchild] = self.crossover(tree1.children[selectedchild], choice(tree2.children), \
-                           probswap, 0)
-      else:
-        result = deepcopy(tree2)
-    return result
+def crossover(self, tree1, tree2, probnext=0.8, top=1):
+    if random() > probnext or tree1.type == "variable":
+      tree1 = tree2
+    else :
+      self.crossover(choice(tree1.children),tree2)
+
+  def getsubtree(self, tree, probnext = 0.8):
+    if random() > probnext or tree.type == "variable":
+      return tree
+    else :
+      return self.getsubtree(choice(tree.children))
 
   def envolve(self, maxgen=100, crossrate=0.9, mutationrate=0.1):
     for i in range(0, maxgen):
@@ -180,7 +179,9 @@ class enviroment:
           while True:
             parent1 = self.population[int(random() * (self.size))]
             parent2 = self.population[int(random() * (self.size))]
-            child = self.crossover(parent1, parent2)
+            child = deepcopy(parent1)
+            sub = self.getsubtree(parent2)
+            self.crossover(child,sub)
             child.refreshdepth()
             if child.getcut() <= self.maxcut:
               self.nextgeneration.append(child)
@@ -230,7 +231,7 @@ class enviroment:
     return self.besttree.lisporder
     #for tree in self.nextgeneration:
      # print tree.fitness
-
+      
   def gettoptree(self, choosebest=0.9, reverse=False):
     if self.minimaxtype == "min":
       self.population.sort()
