@@ -4,6 +4,15 @@ from colormath.color_conversions import convert_color
 import numpy as np
 import pyparsing as pp
 
+WHITE = LabColor(100.0000, -0.0005, -0.0086)
+RED = LabColor(53.2390, 80.0905, 67.2014)
+YELLOW = LabColor(97.1388, -21.5578, 94.4773)
+BLUE = LabColor(32.2994, 79.1914, -107.8655)
+TARGET_IMAGE = None
+
+def set_target_image(t):
+    global TARGET_IMAGE
+    TARGET_IMAGE = t
 
 # cost: np.array(size_x, size_y, 3) , np.array(size_x, size_y, 3) -> float
 def cost(array_a, array_b):
@@ -29,13 +38,28 @@ def fill_color(matrix, x_range, y_range, color):
         for j in y_range:
             matrix[i][j] = color
 
+def check_color(x_range, y_range, color_list):
+    min_error = -1
+    min_error_color = None
+    for c in color_list:
+        sum = 0.0
+        for i in x_range:
+            for j in y_range:
+                dist = delta_e_cie2000(TARGET_IMAGE[i][j], c)
+                sum += dist
+        if min_error == -1 or sum < min_error:
+            min_error = sum
+            min_error_color = c
+    return min_error_color
 
 def recursive_fill(matrix, x_range, y_range, tree, line_width):
     if tree[0] == 'L':
-        fill_color(matrix, 
-                   x_range, 
-                   y_range, 
-                   LabColor(tree[1], tree[2], tree[3]))
+        best_color = check_color(
+            x_range, 
+            y_range, 
+            [WHITE, RED, YELLOW, BLUE])
+        fill_color(matrix, x_range, y_range, best_color)
+    
     elif tree[0] == 'H':
         try:
             sep = int((x_range[-1]+1 - x_range[0]) * float(tree[1]) + x_range[0])
@@ -44,6 +68,7 @@ def recursive_fill(matrix, x_range, y_range, tree, line_width):
             fill_color(matrix, range(sep - line_width, sep + line_width), y_range, LabColor(0, 0, 0))
         except IndexError:
             print("Resolution not enough, cut cannot be seen.")        
+    
     elif tree[0] == 'V':
         try:
             sep = int((y_range[-1]+1 - y_range[0]) * float(tree[1]) + y_range[0])
@@ -52,33 +77,11 @@ def recursive_fill(matrix, x_range, y_range, tree, line_width):
             fill_color(matrix, x_range, range(sep - line_width, sep + line_width),  LabColor(0, 0, 0))
         except IndexError:
             print("Resolution not enough, cut cannot be seen.")
+
 # to_array: string(sexp) -> np.array(size_x, size_y, 3)
 def to_array(str_sexp, size_x=640, size_y=640, line_width=5):
     tree = parse_sexp(str_sexp)    
     matrix = np.zeros((size_x, size_y), dtype=LabColor)
     recursive_fill(matrix, range(0, size_x), range(0, size_y), tree[0], line_width)
     return matrix
-
-
-# random testing
-    
-# a = np.array([[[255, 255, 255], [255, 255, 255]],
-#               [[255, 255, 255], [255, 255, 255]]])
-# b = np.array([[[1, 2, 3], [3, 4, 5]],
-#               [[5, 6, 7], [7, 8, 9]]])
-
-# print(cost(a, b))
-
-
-# s = "(V 0.5 (H 0.5 (L 255 0 0) (L 0 0 255)) (L 255 255 255))"
-# x = to_array(s, 10, 10, 1)
-# print(x)
-
-# random testing end
-
-# print(convert_color(sRGBColor(0, 0, 0, True), LabColor))
-# print(convert_color(sRGBColor(255, 255, 255, True), LabColor))
-# print(convert_color(sRGBColor(255, 0, 0, True), LabColor))
-# print(convert_color(sRGBColor(255, 255, 0, True), LabColor))
-# print(convert_color(sRGBColor(0, 0, 255, True), LabColor))
 
