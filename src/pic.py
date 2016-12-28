@@ -4,6 +4,9 @@ import numpy as np
 from colormath.color_objects import sRGBColor, LabColor, XYZColor
 from colormath.color_diff import delta_e_cie2000
 from colormath.color_conversions import convert_color
+import cost_function as cf
+
+
 
 def pic2rgb(filename, width = 100, height = 100):
 
@@ -35,6 +38,19 @@ def pic2rgb(filename, width = 100, height = 100):
     return labcolor_img
     
 
+
+def fuck_you_pick_rgb_color (labcolor):
+    if labcolor == cf.BLUE:
+        return [0, 0, 255]
+    elif labcolor == cf.RED:
+        return [255, 0, 0]
+    elif labcolor == cf.YELLOW:
+        return [255, 255, 0]
+    elif labcolor == cf.WHITE:
+        return [255, 255, 255]
+    else:
+        return [0, 0, 0]
+
 def rgb2pic(im_array, format='LAB'):
 
     ans_pic = "master_piece.jpg"
@@ -44,10 +60,11 @@ def rgb2pic(im_array, format='LAB'):
     if format != 'RGB':
         for i in range(row):
             for j in range(col):
-                a=convert_color(im_array[i][j], sRGBColor)
-                rgb_img.append([a.rgb_r*255, a.rgb_g*255, a.rgb_b*255])
+                rgb_img.append(fuck_you_pick_rgb_color(im_array[i][j]))
+                print(fuck_you_pick_rgb_color(im_array[i][j]))
     
     rgb_img=np.array(rgb_img, dtype=np.uint8).reshape(row, col, 3)
+    print(rgb_img)
     im = Image.fromarray(rgb_img,'RGB')
     im.save(ans_pic)
     

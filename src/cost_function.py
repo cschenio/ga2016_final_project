@@ -50,6 +50,7 @@ def check_color(x_range, y_range, color_list):
         if min_error == -1 or sum < min_error:
             min_error = sum
             min_error_color = c
+    print(x_range, y_range, min_error_color)
     return min_error_color
 
 def recursive_fill(matrix, x_range, y_range, tree, line_width):
@@ -58,6 +59,7 @@ def recursive_fill(matrix, x_range, y_range, tree, line_width):
             x_range, 
             y_range, 
             [WHITE, RED, YELLOW, BLUE])
+        print("best_color = ", best_color) 
         fill_color(matrix, x_range, y_range, best_color)
     
     elif tree[0] == 'H':
