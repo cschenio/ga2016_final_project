@@ -151,7 +151,7 @@ class enviroment:
       self.mutate(tree.children[selectedchild], probchange, startdepth + 1)
 
 
-def crossover(self, tree1, tree2, probnext=0.8, top=1):
+  def crossover(self, tree1, tree2, probnext=0.8, top=1):
     if random() > probnext or tree1.type == "variable":
       tree1 = tree2
     else :
