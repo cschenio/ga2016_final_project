@@ -36,7 +36,7 @@ def rgb2pic(im_array, format='LAB'):
     row, col = len(im_array), len(im_array[0])
     
     if format != 'RGB':
-        rgb_img=lab2rgb(im_array)
+        rgb_img= lab2rgb(im_array) * 255
     rgb_img=np.array(rgb_img, dtype=np.uint8).reshape(row, col, 3)
     im = Image.fromarray(rgb_img,'RGB')
     im.save(ans_pic)

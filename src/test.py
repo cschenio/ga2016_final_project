@@ -1,5 +1,5 @@
 import cost_function as cf
-import pic
+import pic_sk as pic
 target_image = pic.pic2rgb("../data/img03.jpg", 50, 50)
 cf.set_target_image(target_image)
 

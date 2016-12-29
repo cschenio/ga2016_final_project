@@ -40,7 +40,7 @@ class node:
 
 
   def getfitness(self, image):
-    x, y  = image.shape
+    x, y, _  = image.shape
     self.matrix = cf.to_array(self.display(), x, y, 1)
     self.fitness = cf.cost(self.matrix, image)
 #    self.getcut()
@@ -121,9 +121,9 @@ class enviroment:
     for i in range(0,popsize):
       while True:
         Tree = self._maketree(0)
-        #if Tree.getcut() <= self.maxcut:
-        temp.append(Tree)
-        break
+        if Tree.getcut() <= self.maxcut:
+          temp.append(Tree)
+          break
     return temp
   def _maketree(self, startdepth, threshold=0.8):
     #if startdepth < 2:

@@ -84,5 +84,3 @@ def random_tree(k, matrix, width=100, height = 100, line_width=5):
     
     #rgb2pic(matrix)
     return str_tree
-    
-#print(random_tree(5, pic2rgb('1.jpg'), 100, 100, 1)) #return a lisp tree string

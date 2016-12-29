@@ -14,12 +14,9 @@ def set_target_image(t):
 
 # cost: np.array(size_x, size_y, 3) , np.array(size_x, size_y, 3) -> float
 def cost(array_a, array_b):
-    a = array_a.reshape(-1)
-    b = array_b.reshape(-1)
-    sum = 0
-    
-    sum += deltaE_ciede2000(a, b)
-    return sum
+    a = array_a.reshape(-1,3)
+    b = array_b.reshape(-1,3)
+    return sum(deltaE_ciede2000(a, b))
 
 def parse_sexp(str_sexp):
     w = pp.Word(pp.alphanums + '.' + '-')
@@ -48,7 +45,6 @@ def check_color(x_range, y_range, color_list):
         if min_error == -1 or sum < min_error:
             min_error = sum
             min_error_color = c
-    print(x_range, y_range, min_error_color)
     return min_error_color
 
 def recursive_fill(matrix, x_range, y_range, tree, line_width):
@@ -57,7 +53,6 @@ def recursive_fill(matrix, x_range, y_range, tree, line_width):
             x_range, 
             y_range, 
             [WHITE, RED, YELLOW, BLUE])
-        print("best_color = ", best_color) 
         fill_color(matrix, x_range, y_range, best_color)
     
     elif tree[0] == 'H':
@@ -81,6 +76,6 @@ def recursive_fill(matrix, x_range, y_range, tree, line_width):
 # to_array: string(sexp) -> np.array(size_x, size_y, 3)
 def to_array(str_sexp, size_x=640, size_y=640, line_width=5):
     tree = parse_sexp(str_sexp)    
-    matrix = np.zeros((size_x, size_y), dtype=np.uint8)
+    matrix = np.zeros((size_x, size_y, 3), dtype=np.float)
     recursive_fill(matrix, range(0, size_x), range(0, size_y), tree[0], line_width)
     return matrix
