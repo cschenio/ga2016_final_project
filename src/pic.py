@@ -1,11 +1,7 @@
 from PIL import Image, ImageDraw
 from sys import argv
 import numpy as np
-from colormath.color_objects import sRGBColor, LabColor, XYZColor
-from colormath.color_diff import delta_e_cie2000
-from colormath.color_conversions import convert_color
-import cost_function as cf
-
+from skimage.color import lab2rgb, rgb2lab
 
 
 def pic2rgb(filename, width = 100, height = 100):
@@ -28,46 +24,23 @@ def pic2rgb(filename, width = 100, height = 100):
     nim2=np.asarray(nim2)
     row, col = len(nim2), len(nim2[0])
     labcolor_img=[]
-    
-    for i in range(row):
-        for j in range(col):
-            labcolor_img.append(convert_color(sRGBColor(nim2[i][j][0], nim2[i][j][1], nim2[i][j][2], True), LabColor))
-        
-    labcolor_img = np.array(labcolor_img).reshape(row, col)
+    labcolor_img = rgb2lab(nim2)
 
     return labcolor_img
     
 
+def rgb2pic(im_array, format='LAB', output_path="master_piece.png"):
 
-def fuck_you_pick_rgb_color (labcolor):
-    if labcolor == cf.BLUE:
-        return [0, 0, 255]
-    elif labcolor == cf.RED:
-        return [255, 0, 0]
-    elif labcolor == cf.YELLOW:
-        return [255, 255, 0]
-    elif labcolor == cf.WHITE:
-        return [255, 255, 255]
-    else:
-        return [0, 0, 0]
-
-def rgb2pic(im_array, format='LAB'):
-
-    ans_pic = "master_piece.jpg"
+    ans_pic = output_path
     rgb_img=[]
     row, col = len(im_array), len(im_array[0])
     
     if format != 'RGB':
-        for i in range(row):
-            for j in range(col):
-                rgb_img.append(fuck_you_pick_rgb_color(im_array[i][j]))
-                print(fuck_you_pick_rgb_color(im_array[i][j]))
-    
+        rgb_img= lab2rgb(im_array) * 255
     rgb_img=np.array(rgb_img, dtype=np.uint8).reshape(row, col, 3)
-    print(rgb_img)
     im = Image.fromarray(rgb_img,'RGB')
     im.save(ans_pic)
     
     print('save GA as: ',ans_pic)
+    
 
-#rgb2pic(pic2rgb("1.jpg"),'labcolor')
