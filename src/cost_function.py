@@ -1,13 +1,11 @@
-from colormath.color_objects import sRGBColor, LabColor
-from colormath.color_diff import delta_e_cie2000
-from colormath.color_conversions import convert_color
+from skimage.color import deltaE_ciede2000, lab2rgb, rgb2lab
 import numpy as np
 import pyparsing as pp
 
-WHITE = LabColor(100.0000, -0.0005, -0.0086)
-RED = LabColor(53.2390, 80.0905, 67.2014)
-YELLOW = LabColor(97.1388, -21.5578, 94.4773)
-BLUE = LabColor(32.2994, 79.1914, -107.8655)
+WHITE = [100.0000, -0.0005, -0.0086]
+RED = [53.2390, 80.0905, 67.2014]
+YELLOW = [97.1388, -21.5578, 94.4773]
+BLUE = [32.2994, 79.1914, -107.8655]
 TARGET_IMAGE = None
 
 def set_target_image(t):
@@ -19,8 +17,8 @@ def cost(array_a, array_b):
     a = array_a.reshape(-1)
     b = array_b.reshape(-1)
     sum = 0
-    for i in range(len(a)):
-        sum += delta_e_cie2000(a[i], b[i])
+    
+    sum += deltaE_ciede2000(a, b)
     return sum
 
 def parse_sexp(str_sexp):
@@ -45,7 +43,7 @@ def check_color(x_range, y_range, color_list):
         sum = 0.0
         for i in x_range:
             for j in y_range:
-                dist = delta_e_cie2000(TARGET_IMAGE[i][j], c)
+                dist = deltaE_ciede2000(TARGET_IMAGE[i][j], c)
                 sum += dist
         if min_error == -1 or sum < min_error:
             min_error = sum
@@ -67,7 +65,7 @@ def recursive_fill(matrix, x_range, y_range, tree, line_width):
             sep = int((x_range[-1]+1 - x_range[0]) * float(tree[1]) + x_range[0])
             recursive_fill(matrix, range(x_range[0], sep - line_width), y_range, tree[2], line_width)
             recursive_fill(matrix, range(sep + line_width, x_range[-1]+1), y_range, tree[3], line_width)
-            fill_color(matrix, range(sep - line_width, sep + line_width), y_range, LabColor(0, 0, 0))
+            fill_color(matrix, range(sep - line_width, sep + line_width), y_range, [0, 0, 0])
         except IndexError:
             print("Resolution not enough, cut cannot be seen.")        
     
@@ -76,14 +74,13 @@ def recursive_fill(matrix, x_range, y_range, tree, line_width):
             sep = int((y_range[-1]+1 - y_range[0]) * float(tree[1]) + y_range[0])
             recursive_fill(matrix, x_range, range(y_range[0], sep - line_width), tree[2], line_width)
             recursive_fill(matrix, x_range, range(sep + line_width, y_range[-1]+1), tree[3], line_width)
-            fill_color(matrix, x_range, range(sep - line_width, sep + line_width),  LabColor(0, 0, 0))
+            fill_color(matrix, x_range, range(sep - line_width, sep + line_width),  [0, 0, 0])
         except IndexError:
             print("Resolution not enough, cut cannot be seen.")
 
 # to_array: string(sexp) -> np.array(size_x, size_y, 3)
 def to_array(str_sexp, size_x=640, size_y=640, line_width=5):
     tree = parse_sexp(str_sexp)    
-    matrix = np.zeros((size_x, size_y), dtype=LabColor)
+    matrix = np.zeros((size_x, size_y), dtype=uint8)
     recursive_fill(matrix, range(0, size_x), range(0, size_y), tree[0], line_width)
     return matrix
-
