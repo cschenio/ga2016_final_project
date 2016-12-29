@@ -1,18 +1,16 @@
 from random import random, randint
-from pic import rgb2pic, pic2rgb
-from colormath.color_objects import sRGBColor, LabColor
-from colormath.color_diff import delta_e_cie2000
-from colormath.color_conversions import convert_color
+from pic_sk import rgb2pic, pic2rgb
+from skimage.color import lab2rgb, rgb2lab
 import numpy as np
 import pyparsing as pp
 from cost_function import *
 
 #colors=np.array([[255, 0, 0], [255, 255, 0], [0, 0, 255], [255, 255, 255]],dtype=np.uint8)
  
-colors=[LabColor (lab_l=100.0000, lab_a=-0.0005, lab_b=-0.0086),
-        LabColor (lab_l=53.2390, lab_a=80.0905, lab_b=67.2014),
-        LabColor (lab_l=97.1388, lab_a=-21.5578, lab_b=94.4773),
-        LabColor (lab_l=32.2994, lab_a=79.1914, lab_b=-107.8655)]
+colors=[[100.0000, -0.0005, -0.0086],
+        [53.2390, 80.0905, 67.2014],
+        [97.1388, -21.5578, 94.4773],
+        [32.2994, 79.1914, -107.8655]]
 
 def M_recursive_fill(matrix, x_range, y_range, tree, line_width):
     if tree[0] == 'L':
@@ -22,7 +20,7 @@ def M_recursive_fill(matrix, x_range, y_range, tree, line_width):
             sep = int((x_range[-1]+1 - x_range[0]) * float(tree[1]) + x_range[0])
             M_recursive_fill(matrix, range(x_range[0], sep - line_width), y_range, tree[2], line_width)
             M_recursive_fill(matrix, range(sep + line_width, x_range[-1]+1), y_range, tree[3], line_width)
-            fill_color(matrix, range(sep - line_width, sep + line_width), y_range, LabColor(0, 0, 0))
+            fill_color(matrix, range(sep - line_width, sep + line_width), y_range, [0, 0, 0])
         except IndexError:
             print("Resolution not enough, cut cannot be seen.")        
     elif tree[0] == 'V':
@@ -30,7 +28,7 @@ def M_recursive_fill(matrix, x_range, y_range, tree, line_width):
             sep = int((y_range[-1]+1 - y_range[0]) * float(tree[1]) + y_range[0])
             M_recursive_fill(matrix, x_range, range(y_range[0], sep - line_width), tree[2], line_width)
             M_recursive_fill(matrix, x_range, range(sep + line_width, y_range[-1]+1), tree[3], line_width)
-            fill_color(matrix, x_range, range(sep - line_width, sep + line_width),  LabColor(0, 0, 0))
+            fill_color(matrix, x_range, range(sep - line_width, sep + line_width),  [0, 0, 0])
         except IndexError:
             print("Resolution not enough, cut cannot be seen.")
 
@@ -50,11 +48,11 @@ def choose_color(matrix, x_range, y_range, tree):
         if  color_cost < error: 
             error=color_cost
             choice=color
-        
-    a=convert_color(choice,sRGBColor)
-    rgb_choice=[a.rgb_r*255, a.rgb_g*255, a.rgb_b*255]
+            
+    rgb_choice=lab2rgb([[choice]])
+    print(choice)
     for i in range(3):
-        tree[i+1]=str(rgb_choice[i])
+        tree[i+1]=str(int(rgb_choice[0][0][i]*255))
     return choice
     
 # M_to_array: string(sexp) -> np.array(size_x, size_y, 3)
@@ -91,4 +89,4 @@ def random_tree(k, matrix, width=100, height = 100, line_width=5):
     #rgb2pic(matrix)
     return str_tree
     
-#print(random_tree(5, pic2rgb('1.jpg'), 100, 100, 1)) #return a lisp tree string
+print(random_tree(5, pic2rgb('1.jpg'), 100, 100, 1)) #return a lisp tree string
