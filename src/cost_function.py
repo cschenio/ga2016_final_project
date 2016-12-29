@@ -43,7 +43,7 @@ def check_color(x_range, y_range, color_list):
         sum = 0.0
         for i in x_range:
             for j in y_range:
-                dist = deltaE_ciede2000(TARGET_IMAGE[i][j], c)
+                dist = deltaE_ciede2000([TARGET_IMAGE[i][j]], [c])
                 sum += dist
         if min_error == -1 or sum < min_error:
             min_error = sum
