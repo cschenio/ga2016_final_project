@@ -81,6 +81,6 @@ def recursive_fill(matrix, x_range, y_range, tree, line_width):
 # to_array: string(sexp) -> np.array(size_x, size_y, 3)
 def to_array(str_sexp, size_x=640, size_y=640, line_width=5):
     tree = parse_sexp(str_sexp)    
-    matrix = np.zeros((size_x, size_y), dtype=uint8)
+    matrix = np.zeros((size_x, size_y), dtype=np.uint8)
     recursive_fill(matrix, range(0, size_x), range(0, size_y), tree[0], line_width)
     return matrix
