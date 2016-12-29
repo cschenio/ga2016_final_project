@@ -207,7 +207,7 @@ class enviroment:
       #refresh all tree's fitness
       for k in range(self.size, len(self.nextgeneration)):
         if k % 100 == 0:
-          print k
+          print (k)
         self.nextgeneration[k].getfitness(self.target_image)
         if self.minimaxtype == "min":
           if self.nextgeneration[k].fitness < self.besttree.fitness:
