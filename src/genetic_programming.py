@@ -1,6 +1,5 @@
 '''
 Created on 2009-10-30
-
 @author: Administrator
 '''
 from random import random, randint, choice
@@ -122,11 +121,13 @@ class enviroment:
     for i in range(0,popsize):
       while True:
         Tree = self._maketree(0)
-        if Tree.getcut() <= self.maxcut:
-          temp.append(Tree)
-          break
+        #if Tree.getcut() <= self.maxcut:
+        temp.append(Tree)
+        break
     return temp
   def _maketree(self, startdepth, threshold=0.8):
+    #if startdepth < 2:
+      #nodepattern = 0
     if startdepth == self.maxdepth:
       nodepattern = 1#variable or constant
     else:
@@ -143,9 +144,9 @@ class enviroment:
       return node("variable", None, None, \
             self.variablelist[selectedvariable], None)
 
-  def mutate(self, tree, probchange=0.5, startdepth=0):
+  def mutate(self, tree, probchange=0.3, startdepth=0):
     if random() < probchange:
-      tree = self._maketree(1)
+      tree = self._maketree(0)
     elif tree.type == "function":
       selectedchild = randint(0, len(tree.children) - 1)
       self.mutate(tree.children[selectedchild], probchange, startdepth + 1)
@@ -164,6 +165,7 @@ class enviroment:
       return self.getsubtree(choice(tree.children))
 
   def envolve(self, maxgen=100, crossrate=0.9, mutationrate=0.1):
+    f = open("record.txt",'w')
     for i in range(0, maxgen):
       print ("generation no.", i)
       self.listpopulation()
@@ -183,18 +185,18 @@ class enviroment:
             sub = self.getsubtree(parent2)
             self.crossover(child,sub)
             child.refreshdepth()
-            if child.getcut() <= self.maxcut:
-              self.nextgeneration.append(child)
-              break
+            #if child.getcut() <= self.maxcut:
+            self.nextgeneration.append(child)
+            break
         else:
           while True:
             parent3 = self.population[int(random() * (self.size))]
             child = deepcopy(parent3)
             self.mutate(child)
             child.refreshdepth()
-            if child.getcut() <= self.maxcut:
-              self.nextgeneration.append(child)
-              break
+            #if child.getcut() <= self.maxcut:
+            self.nextgeneration.append(child)
+            break
       #refresh depth    
       for k in range(0, len(self.nextgeneration)):
         self.nextgeneration[k].depth=self.nextgeneration[k].refreshdepth()
@@ -203,7 +205,9 @@ class enviroment:
         self.nextgeneration[i].lisporder = ""
         self.nextgeneration[i].display()
       #refresh all tree's fitness
-      for k in range(0, len(self.nextgeneration)):
+      for k in range(self.size, len(self.nextgeneration)):
+        if k % 100 == 0:
+          print k
         self.nextgeneration[k].getfitness(self.target_image)
         if self.minimaxtype == "min":
           if self.nextgeneration[k].fitness < self.besttree.fitness:
@@ -212,6 +216,7 @@ class enviroment:
           if self.nextgeneration[k].fitness > self.besttree.fitness:
             self.besttree = self.nextgeneration[k]
       print ("best tree's fitness..",self.besttree.fitness)
+      f.write("best tree's fitness.."+ str(self.besttree.fitness))
       #selection
       self.population = []
       self.nextgeneration.sort(key=attrgetter('fitness'))
@@ -226,12 +231,14 @@ class enviroment:
         randomnum += dis
         if randomnum >= float(len(self.nextgeneration) - 1):
           randomnum -= float(len(self.nextgeneration) - 1)
+      print (self.besttree.lisporder)
+      f.write(self.besttree.lisporder)
       if self.besttree.fitness == 0:
         break;
     return self.besttree.lisporder
     #for tree in self.nextgeneration:
      # print tree.fitness
-      
+
   def gettoptree(self, choosebest=0.9, reverse=False):
     if self.minimaxtype == "min":
       self.population.sort()
@@ -265,4 +272,3 @@ class enviroment:
   def listpopulation(self):
     for i in range(0, self.size):
       self.population[i].display()   
-
