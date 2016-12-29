@@ -8,7 +8,6 @@ from PIL import Image, ImageDraw
 from operator import itemgetter, attrgetter
 import sys
 import cost_function as cf
-import pic
 
 class cut:
   def __init__(self, name, childcount):
@@ -43,8 +42,6 @@ class node:
     x, y, _  = image.shape
     self.matrix = cf.to_array(self.display(), x, y, 1)
     self.fitness = cf.cost(self.matrix, image)
-#    self.getcut()
-#    self.fitness=10-self.cut       
 
   def refreshdepth(self):
     self.lisporder = ""
@@ -82,15 +79,13 @@ class node:
     return self.cut
 
 class enviroment:
-  def __init__(self, funwraplist, variablelist, constantlist, checkdata, target_image,\
+  def __init__(self, funwraplist, variablelist, target_image,\
                minimaxtype="min", population=None, size=10, maxdepth=50, maxcut = 6,\
                maxgen=100, crossrate=0.9, mutationrate=0.1, newbirthrate=0.6):
     self.funwraplist = funwraplist
     self.variablelist = variablelist
-    self.constantlist = constantlist
     self.maxcut = maxcut
     self.cut = 0
-    self.checkdata = checkdata
     self.target_image = target_image
     self.minimaxtype = minimaxtype
     self.maxdepth = maxdepth
@@ -102,13 +97,14 @@ class enviroment:
     self.newbirthrate = newbirthrate
     self.nextgeneration = []
     
-
+    self.nfe = 0
     self.besttree = self.population[0]
     for i in range(0, self.size):
       self.population[i].depth=self.population[i].refreshdepth()
       self.population[i].display()
     for i in range(0, self.size):
       self.population[i].getfitness(self.target_image)
+      self.nfe += 1
       if self.minimaxtype == "min":
         if self.population[i].fitness < self.besttree.fitness:
           self.besttree = self.population[i]
@@ -169,8 +165,8 @@ class enviroment:
     for i in range(0, maxgen):
       print ("generation no.", i)
       self.listpopulation()
-      for j in range(0, self.size):
-        print (self.population[j].lisporder)
+      #for j in range(0, self.size):
+      #  print (self.population[j].lisporder)
       self.nextgeneration = []
       for j in range(0, self.size):
         self.nextgeneration.append(self.population[j])
@@ -206,9 +202,10 @@ class enviroment:
         self.nextgeneration[i].display()
       #refresh all tree's fitness
       for k in range(self.size, len(self.nextgeneration)):
-        if k % 100 == 0:
-          print (k)
+        #if k % 100 == 0:
+        #  print (k)
         self.nextgeneration[k].getfitness(self.target_image)
+        self.nfe += 1
         if self.minimaxtype == "min":
           if self.nextgeneration[k].fitness < self.besttree.fitness:
             self.besttree = self.nextgeneration[k]
@@ -216,7 +213,7 @@ class enviroment:
           if self.nextgeneration[k].fitness > self.besttree.fitness:
             self.besttree = self.nextgeneration[k]
       print ("best tree's fitness..",self.besttree.fitness)
-      f.write("best tree's fitness.."+ str(self.besttree.fitness))
+      #f.write("best tree's fitness.."+ str(self.besttree.fitness))
       #selection
       self.population = []
       self.nextgeneration.sort(key=attrgetter('fitness'))
@@ -231,11 +228,11 @@ class enviroment:
         randomnum += dis
         if randomnum >= float(len(self.nextgeneration) - 1):
           randomnum -= float(len(self.nextgeneration) - 1)
-      print (self.besttree.lisporder)
-      f.write(self.besttree.lisporder)
+      #print (self.besttree.lisporder)
+      #f.write(self.besttree.lisporder)
       if self.besttree.fitness == 0:
         break;
-    return self.besttree.lisporder
+    return self.besttree.lisporder, self.besttree.fitness
     #for tree in self.nextgeneration:
      # print tree.fitness
 
@@ -272,3 +269,6 @@ class enviroment:
   def listpopulation(self):
     for i in range(0, self.size):
       self.population[i].display()   
+  
+  def get_nfe(self):
+    return self.nfe

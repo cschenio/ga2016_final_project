@@ -12,7 +12,6 @@ def set_target_image(t):
     global TARGET_IMAGE
     TARGET_IMAGE = t
 
-# cost: np.array(size_x, size_y, 3) , np.array(size_x, size_y, 3) -> float
 def cost(array_a, array_b):
     a = array_a.reshape(-1,3)
     b = array_b.reshape(-1,3)
