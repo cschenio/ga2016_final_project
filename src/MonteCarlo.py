@@ -32,28 +32,24 @@ def M_recursive_fill(matrix, x_range, y_range, tree, line_width):
         except IndexError:
             print("Resolution not enough, cut cannot be seen.")
 
-def choose_color(matrix, x_range, y_range, tree):
+def choose_color(matrix, x_range, y_range, tree): 
+    min_error = -1
+    min_error_color = None
+    for c in colors:
+        sum = 0.0
+        for i in x_range:
+            for j in y_range:
+                dist = deltaE_ciede2000([matrix[i][j]], [c])
+                sum += dist
+        if min_error == -1 or sum < min_error:
+            min_error = sum
+            min_error_color = c
 
-    error, choice= np.inf, []
-    seg=matrix[x_range[0]:x_range[-1]+1][y_range[0]:y_range[-1]+1]
-
-    for color in colors:
-        color_matrix=[[] for _ in range(len(seg))]
-        for i in range(len(seg)):
-            for j in range(len(seg[i])):
-                color_matrix[i].append(color)
-        
-        #print(color_matrix[0][0], seg[0][0])
-        color_cost = cost(seg, np.array(color_matrix))
-        if  color_cost < error: 
-            error=color_cost
-            choice=color
-            
-    rgb_choice=lab2rgb([[choice]])
-    print(choice)
+    rgb_choice=lab2rgb([[min_error_color]])
+    #print(min_error_color)
     for i in range(3):
         tree[i+1]=str(int(rgb_choice[0][0][i]*255))
-    return choice
+    return min_error_color
     
 # M_to_array: string(sexp) -> np.array(size_x, size_y, 3)
 def M_to_array(str_sexp, matrix, size_x=640, size_y=640, line_width=5):
