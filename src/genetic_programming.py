@@ -142,17 +142,26 @@ class enviroment:
 
   def mutate(self, tree, probchange=0.3, startdepth=0):
     if random() < probchange:
-      tree = self._maketree(0)
+      result = self._maketree(0)
+      return result
     elif tree.type == "function":
+      result = deepcopy(tree)
       selectedchild = randint(0, len(tree.children) - 1)
-      self.mutate(tree.children[selectedchild], probchange, startdepth + 1)
+      result.children[selectedchild] = self.mutate(tree.children[selectedchild], probchange, startdepth + 1)
+      return result
+    else:
+      return tree
 
 
   def crossover(self, tree1, tree2, probnext=0.8, top=1):
-    if random() > probnext or tree1.type == "variable":
-      tree1 = tree2
+    if random() > probnext or tree1.type == "variable" or tree2.type == "variable":
+      return deepcopy(tree2), deepcopy(tree1)
     else :
-      self.crossover(choice(tree1.children),tree2)
+      result1 = deepcopy(tree1)
+      result2 = deepcopy(tree2)
+      selectedchild = randint(0, len(tree1.children) - 1)
+      result1.children[selectedchild], result2.children[selectedchild] = self.crossover(tree1.children[selectedchild],tree2.children[selectedchild])
+      return result1, result2
 
   def getsubtree(self, tree, probnext = 0.8):
     if random() > probnext or tree.type == "variable":
@@ -166,29 +175,30 @@ class enviroment:
       print ("generation no.", i)
       self.listpopulation()
       #for j in range(0, self.size):
-      #  print (self.population[j].lisporder)
+        #print (self.population[j].lisporder)
       self.nextgeneration = []
       for j in range(0, self.size):
         self.nextgeneration.append(self.population[j])
       for j in range(0, self.size):
         self.nextgeneration[j].refreshdepth()
-      for j in range(0, 2*self.size):
-        if random() < self.crossrate:
+      for j in range(0, self.size):
+        if random() < crossrate:
           while True:
             parent1 = self.population[int(random() * (self.size))]
             parent2 = self.population[int(random() * (self.size))]
-            child = deepcopy(parent1)
-            sub = self.getsubtree(parent2)
-            self.crossover(child,sub)
-            child.refreshdepth()
+            while parent1 == parent2:
+              parent2 = self.population[int(random() * (self.size))]
+            child1, child2 = self.crossover(parent1, parent2)
+            child1.refreshdepth()
+            child2.refreshdepth()
             #if child.getcut() <= self.maxcut:
-            self.nextgeneration.append(child)
+            self.nextgeneration.append(child1)
+            self.nextgeneration.append(child2)
             break
         else:
           while True:
             parent3 = self.population[int(random() * (self.size))]
-            child = deepcopy(parent3)
-            self.mutate(child)
+            child = self.mutate(parent3)
             child.refreshdepth()
             #if child.getcut() <= self.maxcut:
             self.nextgeneration.append(child)
