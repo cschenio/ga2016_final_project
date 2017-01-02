@@ -61,7 +61,8 @@ def recursive_fill(matrix, x_range, y_range, tree, line_width):
             recursive_fill(matrix, range(sep + line_width, x_range[-1]+1), y_range, tree[3], line_width)
             fill_color(matrix, range(sep - line_width, sep + line_width), y_range, [0, 0, 0])
         except IndexError:
-            print("Resolution not enough, cut cannot be seen.")        
+            return
+            #print("Resolution not enough, cut cannot be seen.")        
     
     elif tree[0] == 'V':
         try:
@@ -70,7 +71,8 @@ def recursive_fill(matrix, x_range, y_range, tree, line_width):
             recursive_fill(matrix, x_range, range(sep + line_width, y_range[-1]+1), tree[3], line_width)
             fill_color(matrix, x_range, range(sep - line_width, sep + line_width),  [0, 0, 0])
         except IndexError:
-            print("Resolution not enough, cut cannot be seen.")
+            return
+            #print("Resolution not enough, cut cannot be seen.")
 
 # to_array: string(sexp) -> np.array(size_x, size_y, 3)
 def to_array(str_sexp, size_x=640, size_y=640, line_width=5):

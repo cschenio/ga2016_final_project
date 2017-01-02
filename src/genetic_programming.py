@@ -174,8 +174,8 @@ class enviroment:
     for i in range(0, maxgen):
       print ("generation no.", i)
       self.listpopulation()
-      #for j in range(0, self.size):
-        #print (self.population[j].lisporder)
+      for j in range(0, self.size):
+        print (self.population[j].lisporder)
       self.nextgeneration = []
       for j in range(0, self.size):
         self.nextgeneration.append(self.population[j])
@@ -212,8 +212,8 @@ class enviroment:
         self.nextgeneration[i].display()
       #refresh all tree's fitness
       for k in range(self.size, len(self.nextgeneration)):
-        #if k % 100 == 0:
-        #  print (k)
+        if k % 100 == 0:
+          print (k)
         self.nextgeneration[k].getfitness(self.target_image)
         self.nfe += 1
         if self.minimaxtype == "min":
@@ -223,7 +223,7 @@ class enviroment:
           if self.nextgeneration[k].fitness > self.besttree.fitness:
             self.besttree = self.nextgeneration[k]
       print ("best tree's fitness..",self.besttree.fitness)
-      #f.write("best tree's fitness.."+ str(self.besttree.fitness))
+      f.write("best tree's fitness.."+ str(self.besttree.fitness))
       #selection
       self.population = []
       self.nextgeneration.sort(key=attrgetter('fitness'))
@@ -238,13 +238,13 @@ class enviroment:
         randomnum += dis
         if randomnum >= float(len(self.nextgeneration) - 1):
           randomnum -= float(len(self.nextgeneration) - 1)
-      #print (self.besttree.lisporder)
-      #f.write(self.besttree.lisporder)
+      print (self.besttree.lisporder)
+      f.write(self.besttree.lisporder)
       if self.besttree.fitness == 0:
         break;
     return self.besttree.lisporder, self.besttree.fitness
-    #for tree in self.nextgeneration:
-     # print tree.fitness
+    for tree in self.nextgeneration:
+      print (tree.fitness)
 
   def gettoptree(self, choosebest=0.9, reverse=False):
     if self.minimaxtype == "min":
